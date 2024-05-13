@@ -1,0 +1,107 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  package:
+    name: Package Distribution
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Hatch
+        run: |
+          python -m pip install --upgrade pip
+          pip install hatch
+      - name: Set Release Version
+        run: |
+          hatch version release
+          echo "RELEASE_VERSION=$(hatch version)" >> $GITHUB_ENV
+      - name: Run Test Coverage
+        run: hatch run cov -v
+      - name: Build
+        run: hatch build
+      - name: Commit Release Version
+        uses: planetscale/ghcommit-action@v0.1.38
+        with:
+          commit_message: "Released version ${{ env.RELEASE_VERSION }}"
+          repo: ${{ github.repository }}
+          branch: ${{ github.head_ref || github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure Git User
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Pull Latest Sources
+        run: |
+          git reset --hard HEAD
+          git pull
+      - name: Tag Release Version
+        run: |
+          git tag -a "$RELEASE_VERSION" -m "Released version $RELEASE_VERSION"
+          git push origin "$RELEASE_VERSION"
+      - name: Upload Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: hatch-datavolo-nar-distribution
+          path: dist/
+      - name: Set Next Development Version
+        run: |
+          hatch version micro,dev
+          echo "NEXT_VERSION=$(hatch version)" >> $GITHUB_ENV
+      - name: Commit Next Version
+        uses: planetscale/ghcommit-action@v0.1.38
+        with:
+          commit_message: "Set version ${{ env.NEXT_VERSION }}"
+          repo: ${{ github.repository }}
+          branch: ${{ github.head_ref || github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-to-testpypi:
+    name: Publish Distribution to TestPyPI
+    needs:
+      - package
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/hatch-datavolo-nar
+    steps:
+      - name: Download Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: hatch-datavolo-nar-distribution
+          path: dist/
+      - name: Publish Distribution
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-to-pypi:
+    name: Publish Distribution to PyPI
+    needs:
+      - package
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+    environment:
+      name: pypi
+      url: https://pypi.org/p/hatch-datavolo-nar
+    steps:
+      - name: Download Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: hatch-datavolo-nar-distribution
+          path: dist/
+      - name: Publish Distribution
+        uses: pypa/gh-action-pypi-publish@release/v1

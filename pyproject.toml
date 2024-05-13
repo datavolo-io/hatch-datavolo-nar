@@ -1,0 +1,97 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hatch-datavolo-nar"
+dynamic = ["version"]
+description = "Hatch plugin for building Apache NiFi NAR bundles"
+requires-python = ">=3.11"
+keywords = ["hatch", "nar", "datavolo", "nifi"]
+license = { file = "LICENSE" }
+readme = "README.md"
+authors = [
+    { name = "Datavolo Developers", email = "dev@datavolo.io" },
+]
+maintainers = [
+    { name = "Datavolo Developers", email = "dev@datavolo.io" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: Apache Software License",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Hatch",
+]
+dependencies = ["hatchling"]
+
+[project.urls]
+Issues = "https://github.com/datavolo-io/hatch-datavolo-nar/issues"
+Source = "https://github.com/datavolo-io/hatch-datavolo-nar"
+
+[project.entry-points.hatch]
+datavolo-nar = "hatch_datavolo_nar.hooks"
+
+[tool.hatch.version]
+path = "src/hatch_datavolo_nar/__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+    "coverage[toml]==7.4.4",
+    "pytest",
+]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+    "- coverage combine",
+    "coverage report",
+]
+cov = [
+    "test-cov",
+    "cov-report",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.11", "3.12"]
+
+[tool.hatch.envs.types]
+dependencies = [
+    "mypy==1.9.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/hatch_datavolo_nar tests}"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source_pkgs = ["hatch_datavolo_nar", "tests"]
+branch = true
+parallel = true
+omit = [
+    "src/hatch_datavolo_nar/__about__.py",
+]
+
+[tool.coverage.paths]
+testing = ["src/hatch_datavolo_nar"]
+tests = ["tests"]
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
+exclude_lines = [
+    "no cov",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+preview = true
+extend-select = ["CPY001"]
+
+[tool.ruff.lint.flake8-copyright]
+notice-rgx = "# SPDX-FileCopyrightText: 2024 Datavolo Inc.\n#\n# SPDX-License-Identifier: Apache-2.0\n"
