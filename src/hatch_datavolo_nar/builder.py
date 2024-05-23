@@ -5,7 +5,6 @@
 import io
 import os
 import sys
-import time
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from pathlib import Path
@@ -13,7 +12,7 @@ from shlex import quote
 from shutil import rmtree
 from subprocess import PIPE, check_call
 from typing import Any
-from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
+from zipfile import ZIP_DEFLATED, ZipFile
 
 from hatchling.builders.config import BuilderConfig
 from hatchling.builders.plugin.interface import BuilderInterface
@@ -22,6 +21,8 @@ from hatchling.metadata.core import ProjectMetadata
 
 
 class NarBundle:
+    DIRECTORY_MODE = 0o755
+
     def __init__(self, zip_descriptor: ZipFile):
         self.zip_descriptor = zip_descriptor
         self.directories_added: list[str] = []
@@ -42,11 +43,8 @@ class NarBundle:
         self.zip_descriptor.write(path, normalized_archive_name)
 
     def mkdir(self, directory_name: str) -> None:
-        now = time.localtime()
-        date_time = now[0:6]
-        archive_info = ZipInfo(f"{directory_name}/", date_time)
-        archive_info.CRC = 0
-        self.zip_descriptor.mkdir(archive_info)
+        directory_mode = self.DIRECTORY_MODE
+        self.zip_descriptor.mkdir(directory_name, mode=directory_mode)
 
     def write_manifest(self, metadata: ProjectMetadata) -> None:
         manifest_dir = "META-INF"
