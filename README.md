@@ -6,6 +6,8 @@ archives for [Apache NiFi](https://nifi.apache.org). The NAR format uses the
 [ZIP](https://en.wikipedia.org/wiki/ZIP_(file_format)) file structure, containing a manifest
 and NiFi components with dependencies.
 
+[![pypi](https://img.shields.io/pypi/v/hatch-datavolo-nar.svg)](https://pypi.org/project/hatch-datavolo-nar/)
+[![python-versions](https://img.shields.io/pypi/pyversions/hatch-datavolo-nar.svg)](https://pypi.org/project/hatch-datavolo-nar/)
 [![build](https://github.com/datavolo-io/hatch-datavolo-nar/actions/workflows/build.yml/badge.svg)](https://github.com/datavolo-io/hatch-datavolo-nar/actions/workflows/build.yml)
 [![license](https://img.shields.io/github/license/datavolo-io/hatch-datavolo-nar)](https://github.com/datavolo-io/hatch-datavolo-nar/blob/main/LICENSE)
 [![Hatch](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
