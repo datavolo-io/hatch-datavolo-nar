@@ -137,6 +137,12 @@ def test_build_with_dependencies(dist_path: Path, project_root: Path, project_na
         assert "NAR-INF/bundled-dependencies/bech32/" in nar_entries
         assert "NAR-INF/bundled-dependencies/bech32/__init__.py" in nar_entries
 
+        meta_dir_info = nar.getinfo("META-INF/")
+
+        expected_directory_mode = 0o755
+        expected_external_attr = ((0o40000 | expected_directory_mode) & 0xFFFF) << 16 | 0x10
+        assert meta_dir_info.external_attr == expected_external_attr
+
     cache_path = dist_path / "pip-cache"
     assert cache_path.is_dir()
 
