@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import datetime
 import os
 from pathlib import Path
 from zipfile import ZipFile
@@ -155,8 +156,12 @@ def assert_manifest_found(nar: ZipFile, project_name: str, project_version: str)
     manifest_binary = nar.read("META-INF/MANIFEST.MF")
     manifest = str(manifest_binary, encoding="utf-8")
 
+    now = datetime.datetime.now(datetime.UTC)
+    partial_timestamp = now.strftime("%Y-%m-%dT")
+
     assert "Manifest-Version: 1.0" in manifest
     assert "Created-By: hatch-datavolo-nar" in manifest
+    assert f"Build-Timestamp: {partial_timestamp}" in manifest
     assert f"Nar-Id: {project_name}-nar" in manifest
     assert f"Nar-Group: {project_name}" in manifest
     assert f"Nar-Version: {project_version}" in manifest
