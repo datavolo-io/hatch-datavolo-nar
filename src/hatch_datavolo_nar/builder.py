@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import datetime
 import io
 import os
 import sys
@@ -22,6 +23,8 @@ from hatchling.metadata.core import ProjectMetadata
 
 class NarBundle:
     DIRECTORY_MODE = 0o755
+
+    BUILD_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
     def __init__(self, zip_descriptor: ZipFile):
         self.zip_descriptor = zip_descriptor
@@ -50,9 +53,13 @@ class NarBundle:
         manifest_dir = "META-INF"
         self.mkdir(manifest_dir)
 
+        current_timestamp = datetime.datetime.now(datetime.UTC)
+        build_timestamp = current_timestamp.strftime(self.BUILD_TIMESTAMP_FORMAT)
+
         manifest_lines = [
             "Manifest-Version: 1.0",
             "Created-By: hatch-datavolo-nar",
+            f"Build-Timestamp: {build_timestamp}",
             f"Nar-Id: {metadata.core.raw_name}-nar",
             f"Nar-Group: {metadata.core.raw_name}",
             f"Nar-Version: {metadata.version}",
