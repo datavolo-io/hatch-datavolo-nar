@@ -122,9 +122,7 @@ class NarBuilder(BuilderInterface):
 
         cache_dir = self.get_cache_dir(build_directory)
         dependencies_dir = Path(f"{build_directory}/{bundled_dependencies_dir}")
-        dependency: str
-        for dependency in self.metadata.core.dependencies:
-            self.install_dependency(dependency, dependencies_dir, cache_dir)
+        self.install_dependencies(dependencies_dir, cache_dir)
 
         installed_dependencies = Path(dependencies_dir).glob("**/*")
         installed_dependency: Path
@@ -138,15 +136,19 @@ class NarBuilder(BuilderInterface):
         nar_dependencies_dir = Path(f"{build_directory}/{nar_inf_dir}")
         rmtree(nar_dependencies_dir)
 
-    def install_dependency(self, dependency: str, directory: Path, cache_dir: str) -> None:
-        self.app.display_waiting(f"Loading dependency [{dependency}]")
+    def install_dependencies(self, directory: Path, cache_dir: str) -> None:
+        self.app.display_waiting("Loading dependencies")
 
         install_arguments = [
             sys.executable,
             "-m",
             "pip",
             "install",
-            quote(dependency),
+        ]
+
+        install_arguments.extend(quote(dependency) for dependency in self.metadata.core.dependencies)
+
+        additional_arguments = [
             "--upgrade",
             "--no-python-version-warning",
             "--no-input",
@@ -156,6 +158,8 @@ class NarBuilder(BuilderInterface):
             "--target",
             quote(str(directory.absolute())),
         ]
+
+        install_arguments.extend(additional_arguments)
         check_call(install_arguments, stdout=PIPE, stderr=PIPE, shell=False)
 
     def get_cache_dir(self, build_directory: str) -> str:

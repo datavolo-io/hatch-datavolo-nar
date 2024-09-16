@@ -89,7 +89,11 @@ def test_build_standard(builder: NarBuilder, dist_path: Path, project_name: str,
 
 
 def test_build_with_dependencies(dist_path: Path, project_root: Path, project_name: str, project_version: str):
-    project_config = {"name": project_name, "version": project_version, "dependencies": ["bech32==1.2.0"]}
+    project_config = {
+        "name": project_name,
+        "version": project_version,
+        "dependencies": ["bech32==1.2.0", "json5==0.9.25"],
+    }
     project_metadata = get_project_metadata(project_config, project_root)
 
     excluded_file = ".DS_Store"
@@ -137,6 +141,8 @@ def test_build_with_dependencies(dist_path: Path, project_root: Path, project_na
         assert "NAR-INF/bundled-dependencies/" in nar_entries
         assert "NAR-INF/bundled-dependencies/bech32/" in nar_entries
         assert "NAR-INF/bundled-dependencies/bech32/__init__.py" in nar_entries
+        assert "NAR-INF/bundled-dependencies/json5/" in nar_entries
+        assert "NAR-INF/bundled-dependencies/json5/__init__.py" in nar_entries
 
         meta_dir_info = nar.getinfo("META-INF/")
 
