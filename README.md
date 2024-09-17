@@ -57,6 +57,8 @@ The `hatch-datavolo-nar` plugin provides the `nar` build target, which can be in
 hatch build -t nar
 ```
 
+A Python NAR with platform-specific dependencies requires building on a machine with the same architecture as the runtime system.
+
 ## Developing
 
 Run the following Hatch command to build the project:
@@ -71,6 +73,12 @@ The Python wheel can be referenced using a file URI in a project build system.
 [build-system]
 requires = ["hatchling", "hatch-datavolo-nar@file:///dist/hatch_datavolo_nar-0.1.0-py3-none-any.whl"]
 build-backend = "hatchling.build"
+```
+
+The Hatch build environment caches build plugins, which requires pruning existing environments to use a new version of the plugin.
+
+```shell
+hatch env prune
 ```
 
 ### Coding Conventions
