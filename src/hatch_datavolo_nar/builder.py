@@ -140,7 +140,7 @@ class NarBuilder(BuilderInterface):
         self.app.display_waiting("Loading dependencies")
 
         install_arguments = [
-            sys.executable,
+            Path(sys.executable).absolute().as_posix(),
             "-m",
             "pip",
             "install",
@@ -153,10 +153,10 @@ class NarBuilder(BuilderInterface):
             "--no-python-version-warning",
             "--no-input",
             "--cache-dir",
-            quote(cache_dir),
+            Path(cache_dir).absolute().as_posix(),
             "--quiet",
             "--target",
-            quote(str(directory.absolute())),
+            directory.absolute().as_posix(),
         ]
 
         install_arguments.extend(additional_arguments)
