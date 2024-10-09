@@ -73,11 +73,11 @@ def test_clean(builder: NarBuilder, dist_path: Path, project_name: str, project_
 
 
 def test_build_standard(builder: NarBuilder, dist_path: Path, project_name: str, project_version: str):
-    target_nar = builder.build_standard(dist_path.as_posix())
+    target_nar = Path(builder.build_standard(dist_path.as_posix()))
 
     nar_filename = get_nar_filename(project_name, project_version)
     expected_target_nar = dist_path / nar_filename
-    assert target_nar == expected_target_nar.as_posix()
+    assert target_nar.as_posix() == expected_target_nar.as_posix()
 
     with ZipFile(target_nar) as nar:
         nar.testzip()
@@ -118,11 +118,11 @@ def test_build_with_dependencies(dist_path: Path, project_root: Path, project_na
     record_processor.touch()
 
     builder = NarBuilder(project_root.as_posix(), metadata=project_metadata)
-    target_nar = builder.build_standard(dist_path.as_posix())
+    target_nar = Path(builder.build_standard(dist_path.as_posix()))
 
     nar_filename = get_nar_filename(project_name, project_version)
     expected_target_nar = dist_path / nar_filename
-    assert target_nar == expected_target_nar.as_posix()
+    assert target_nar.as_posix() == expected_target_nar.as_posix()
 
     with ZipFile(target_nar) as nar:
         nar.testzip()
